@@ -1,0 +1,3 @@
+trainer\Vokabeltrainer.class
+ui\TrainerGui.class
+trainer\DatabaseAdministrator.class
