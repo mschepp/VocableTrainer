@@ -29,3 +29,7 @@ Database*
 
 #eclipse settings
 .setting*
+/bin/
+/target/
+
+*wing*
