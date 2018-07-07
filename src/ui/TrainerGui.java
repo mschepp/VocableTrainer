@@ -2,7 +2,10 @@ package ui;
 
 import java.io.File;
 
+import com.sun.glass.events.WindowEvent;
+
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
@@ -18,10 +21,13 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
+import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.Window;
+import trainer.JapanischTrainer;
 import trainer.JapanischTrainer.japaneseWriting;
+import trainer.Vokabeltrainer;
 
 public class TrainerGui extends Application {
 
@@ -29,6 +35,8 @@ public class TrainerGui extends Application {
 	private Button showSol, check, next;
 	private TextField input = new TextField();
 	private String dbPath = "C:/Users/Melanie_local/workspaceJava-Photon/VokabelTrainer/Database/vokabeln.sql";
+
+	Vokabeltrainer vocTrainer;
 
 	public TrainerGui() {
 		// TODO Auto-generated constructor stub
@@ -38,6 +46,7 @@ public class TrainerGui extends Application {
 		this.check = new Button("Check/Lösung");
 		this.next = new Button("Nächste Vokabel");
 		this.input = new TextField();
+		this.vocTrainer = new JapanischTrainer(this.dbPath);
 
 	}
 
@@ -129,39 +138,65 @@ public class TrainerGui extends Application {
 				System.exit(0);
 			}
 		});
-		
+
 		dbAction.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent e) {
-				FileChooser chooseDB = new FileChooser();
-				File chosen=chooseDB.showOpenDialog(new Stage());
-				// is null if no file selected
-				if (chosen != null) {
-					dbPath = chosen.getPath();
-					System.out.println(chosen.getPath());
-				}
-
+				showDialog();
 			}
 		});
 
 		kanaAnswer.setOnAction(new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent e) {
+				setModusAnswer(japaneseWriting.KANA);
+			}
+		});
+
+		kanaQuest.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent e) {
 				setModusQuest(japaneseWriting.KANA);
 			}
 		});
-		
+
+		kanjiAnswer.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent e) {
+				setModusAnswer(japaneseWriting.KANJI);
+			}
+		});
+
+		kanjiQuest.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent e) {
+				setModusQuest(japaneseWriting.KANJI);
+			}
+		});
+
+		romajiAnswer.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent e) {
+				setModusAnswer(japaneseWriting.ROMAJI);
+			}
+		});
+
+		romajiQuest.setOnAction(new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent e) {
+				setModusQuest(japaneseWriting.ROMAJI);
+			}
+		});
 
 		primaryStage.setScene(scene);
+		primaryStage.setOnCloseRequest(e -> {
+			Platform.exit();
+			System.exit(0);
+		});
+
 		primaryStage.show();
 
 	}
-	
 
 	/**
 	 * @TODO need to be implemented
 	 * @param mod
 	 */
 	public void setModusQuest(japaneseWriting mod) {
-		
+		System.out.println("quest mod");
 	}
 
 	/**
@@ -169,7 +204,7 @@ public class TrainerGui extends Application {
 	 * @param mod
 	 */
 	public void setModusAnswer(japaneseWriting mod) {
-
+		System.out.println("answer mod");
 	}
 
 	/**
@@ -178,7 +213,38 @@ public class TrainerGui extends Application {
 	public void refresh() {
 		this.actVoc.setText("calledRefresh");
 	}
-	
+
+	private void showDialog() {
+		FileChooser chooseDB = new FileChooser();
+		File chosen = chooseDB.showOpenDialog(new Stage());
+		// is null if no file selected
+		if (chosen != null) {
+			String newPath = chosen.getPath();
+			if (newPath.endsWith(".sql")) {
+				dbPath = newPath;
+				System.out.println(newPath);
+			} else {
+				errorWindow("Wrong file extension");
+
+			}
+		}
+	}
+
+	public void errorWindow(String messages, double width, double height) {
+		Text errorMess = new Text(messages);
+		BorderPane errorPane = new BorderPane();
+		errorPane.setCenter(errorMess);
+		Scene errorScene = new Scene(errorPane, width, height);
+		Stage errorStage = new Stage();
+		errorStage.setTitle("Error");
+		errorStage.setScene(errorScene);
+		errorStage.setResizable(false);
+		errorStage.show();
+	}
+
+	public void errorWindow(String messages) {
+		errorWindow(messages, 200, 100);
+	}
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
