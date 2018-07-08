@@ -269,8 +269,10 @@ public class TrainerGui extends Application {
 		if (chosen != null) {
 			String newPath = chosen.getPath();
 			if (newPath.endsWith(".sql")) {
-				dbPath = newPath;
-				System.out.println(newPath);
+				this.dbPath = newPath;
+				this.vocTrainer=new JapanischTrainer(this.dbPath);
+				refresh();
+				//System.out.println(newPath);
 			} else {
 				errorWindow("Wrong file extension");
 
