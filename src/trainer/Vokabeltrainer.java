@@ -13,8 +13,9 @@ public class Vokabeltrainer {
 	private DataBaseAdministrator db;
 	private ResultSet actVocResultSet;
 	private String[] colums;
+	private String[] actVoc;
 	private long allVocN=0;
-	private ArrayList<Integer> askIds=new ArrayList<>();
+	private ArrayList<Integer> askedIds=new ArrayList<>();
 	
 	//private String[] actVoc;
 	
@@ -35,22 +36,15 @@ public class Vokabeltrainer {
 		super();
 		this.dbPath = dbPath;
 		this.db=new DataBaseAdministrator(dbPath);
-		this.colums=db.determinColumns();
+		this.colums=db.determineColumns();
+		this.initRandomVocabulary();
 		
 	}
 	
 	
 	public String getActVocable() {
-		try {
-			this.actVocResultSet.next();
-			this.actVocResultSet.getString("Deutsch");
-		}
-		catch (SQLException e) {
-			// TODO: handle exception
-			System.out.println(e.getMessage());
-		}
-		
-		return "actVoc";
+		return this.actVoc[this.languageId];
+		//return "actVoc";
 	}
 	
 	
@@ -65,15 +59,24 @@ public class Vokabeltrainer {
 	
 	public void initRandomVocabulary() {
 		String sql="SELECT ";
-		String[] cols=this.db.getColumns();
-		for(int i=0;i<cols.length;i++) {
-			sql=sql+cols[i];
-			if(i!=cols.length-1)
+		this.colums=this.db.getColumns();
+		for(int i=0;i<this.colums.length;i++) {
+			sql=sql+this.colums[i];
+			if(i!=this.colums.length-1)
 				sql=sql+",";
 		}
 		sql=sql+" FROM "+ this.db.getTableName() +" ORDER BY RANDOM()";
+		ArrayList<String> row=new ArrayList<>();
 		try {
-			this.actVocResultSet=this.db.executeSQLWithResult(sql);
+			ResultSet vocResultSet=this.db.executeSQLWithResult(sql);
+			vocResultSet.next();
+			row.add(Integer.toString(vocResultSet.getInt(colums[0])));
+			askedIds.add(vocResultSet.getInt(colums[0]));
+			for(int i=1;i<this.colums.length;i++) {
+				row.add(vocResultSet.getString(this.colums[i]));
+			}
+			String[] help= {};
+			this.actVoc=row.toArray(help);
 					
 		}
 		catch(SQLException e) {

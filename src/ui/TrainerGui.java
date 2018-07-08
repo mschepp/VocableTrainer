@@ -43,8 +43,9 @@ public class TrainerGui extends Application {
 		this.vocTrainer = new JapanischTrainer(this.dbPath);
 		Font font=new Font(20);
 		Font font2=new Font(15);
+		Font font3=new Font(24);
 		this.actVoc = new Label(this.vocTrainer.getActVocable());
-		this.actVoc.setFont(font);		
+		this.actVoc.setFont(font3);		
 		this.solution = new Label(solutionTextDefault);
 		this.solution.setFont(font);
 		this.showSol = new Button("Zeige L\u00f6sung");
