@@ -67,6 +67,8 @@ public class TrainerGui extends Application {
 		primaryStage.setTitle("Vokabeltrainer");
 		BorderPane bPane = new BorderPane();
 		Scene scene = new Scene(bPane, 675, 475);
+		primaryStage.setMinHeight(440);
+		primaryStage.setMinWidth(670);
 		this.input.setMinHeight(425 / 3.);
 
 		// menu
