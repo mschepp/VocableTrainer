@@ -2,7 +2,6 @@ package ui;
 
 import java.io.File;
 
-import com.sun.glass.events.WindowEvent;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -21,10 +20,10 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.stage.Window;
 import trainer.JapanischTrainer;
 import trainer.JapanischTrainer.japaneseWriting;
 import trainer.Vokabeltrainer;
@@ -35,18 +34,28 @@ public class TrainerGui extends Application {
 	private Button showSol, check, next;
 	private TextField input = new TextField();
 	private String dbPath = "C:/Users/Melanie_local/workspaceJava-Photon/VokabelTrainer/Database/vokabeln.sql";
+	private String solutionTextDefault = "Solution";
 
 	Vokabeltrainer vocTrainer;
 
 	public TrainerGui() {
 		// TODO Auto-generated constructor stub
-		this.actVoc = new Label("Vokabel");
-		this.solution = new Label("Solution");
-		this.showSol = new Button("Zeige Lösung");
-		this.check = new Button("Check/Lösung");
-		this.next = new Button("Nächste Vokabel");
-		this.input = new TextField();
 		this.vocTrainer = new JapanischTrainer(this.dbPath);
+		Font font=new Font(20);
+		Font font2=new Font(15);
+		this.actVoc = new Label(this.vocTrainer.getActVocable());
+		this.actVoc.setFont(font);		
+		this.solution = new Label(solutionTextDefault);
+		this.solution.setFont(font);
+		this.showSol = new Button("Zeige L\u00f6sung");
+		this.showSol.setFont(font2);
+		this.check = new Button("Check/L\u00f6sung");
+		this.check.setFont(font2);
+		this.next = new Button("N\u00e4chste Vokabel");
+		this.next.setFont(font2);
+		this.input = new TextField();
+		this.input.setFont(font);
+		
 
 	}
 
@@ -119,12 +128,14 @@ public class TrainerGui extends Application {
 
 		gPane.add(this.actVoc, 1, 0);
 		gPane.add(this.showSol, 0, 1);
-		gPane.add(this.check, 0, 2);
-		gPane.add(this.next, 2, 2);
 		gPane.add(this.input, 1, 1);
+		gPane.add(this.check, 0, 2);
+		gPane.add(this.solution, 1, 2);
+		gPane.add(this.next, 2, 2);
 
 		gPane.setAlignment(Pos.CENTER);
 		GridPane.setHalignment(this.check, HPos.CENTER);
+		GridPane.setHalignment(this.solution, HPos.CENTER);
 		GridPane.setHalignment(this.actVoc, HPos.CENTER);
 		GridPane.setHalignment(this.next, HPos.CENTER);
 		GridPane.setHalignment(this.showSol, HPos.CENTER);
@@ -140,45 +151,77 @@ public class TrainerGui extends Application {
 		});
 
 		dbAction.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
 			public void handle(ActionEvent e) {
 				showDialog();
 			}
 		});
 
 		kanaAnswer.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
 			public void handle(ActionEvent e) {
 				setModusAnswer(japaneseWriting.KANA);
 			}
 		});
 
 		kanaQuest.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
 			public void handle(ActionEvent e) {
 				setModusQuest(japaneseWriting.KANA);
 			}
 		});
 
 		kanjiAnswer.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
 			public void handle(ActionEvent e) {
 				setModusAnswer(japaneseWriting.KANJI);
 			}
 		});
 
 		kanjiQuest.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
 			public void handle(ActionEvent e) {
 				setModusQuest(japaneseWriting.KANJI);
 			}
 		});
 
 		romajiAnswer.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
 			public void handle(ActionEvent e) {
 				setModusAnswer(japaneseWriting.ROMAJI);
 			}
 		});
 
 		romajiQuest.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
 			public void handle(ActionEvent e) {
 				setModusQuest(japaneseWriting.ROMAJI);
 			}
+		});
+		
+		
+		this.next.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				getNext();
+			}
+		});
+		
+		this.showSol.setOnAction( new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				// TODO Auto-generated method stub
+				showSolution();
+			}
+		});
+		
+		this.check.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				// TODO Auto-generated method stub
+				check();
+			}
+
 		});
 
 		primaryStage.setScene(scene);
@@ -207,11 +250,13 @@ public class TrainerGui extends Application {
 		System.out.println("answer mod");
 	}
 
-	/**
-	 * @TODO need to be changed to functional implementation
-	 */
+	public void resetTextField() {
+		this.input.clear();
+	}
+	
+	
 	public void refresh() {
-		this.actVoc.setText("calledRefresh");
+		this.actVoc.setText(this.vocTrainer.getActVocable());
 	}
 
 	private void showDialog() {
@@ -230,6 +275,12 @@ public class TrainerGui extends Application {
 		}
 	}
 
+
+	public void check() {
+		showSolution();
+	}
+	
+	
 	public void errorWindow(String messages, double width, double height) {
 		Text errorMess = new Text(messages);
 		BorderPane errorPane = new BorderPane();
@@ -244,6 +295,26 @@ public class TrainerGui extends Application {
 
 	public void errorWindow(String messages) {
 		errorWindow(messages, 200, 100);
+	}
+	
+	
+	
+	public void getNext() {
+		this.actVoc.setText(this.vocTrainer.getNextVocable());
+		this.solution.setText(this.solutionTextDefault);
+		resetTextField();
+	}
+	
+	public void showSolution() {
+		this.solution.setText(this.vocTrainer.getSolution());
+	}
+	
+	
+	/**
+	 * @TODO need to be implemented
+	 */
+	public void reverse() {
+		
 	}
 
 	public static void main(String[] args) {

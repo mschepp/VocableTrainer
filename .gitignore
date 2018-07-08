@@ -25,7 +25,7 @@ hs_err_pid*
 
 #Databases
 *.sql
-Database*
+
 
 #eclipse settings
 .setting*
