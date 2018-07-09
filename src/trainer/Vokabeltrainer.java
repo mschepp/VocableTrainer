@@ -7,13 +7,13 @@ import java.util.ArrayList;
 public class Vokabeltrainer {
 
 	private String dbPath;
-	private int languageId = 1;
-	private int GermanId = 2;
-	private int answerId = 2;
+	protected int languageId = 1;
+	protected int GermanId = -1;
+	protected int answerId = -1;
 	private DataBaseAdministrator db;
 	private ResultSet actVocResultSet;
-	private String[] colums;
-	private String[] actVoc;
+	private ArrayList<String> colums;
+	protected String[] actVoc;
 	private long allVocN = 0;
 	private ArrayList<Integer> askedIds = new ArrayList<>();
 	private String[] help= {};
@@ -24,6 +24,8 @@ public class Vokabeltrainer {
 		this.db = new DataBaseAdministrator(dbPath);
 		this.colums = db.determineColumns();
 		this.initRandomVocabulary();
+		determineGermanId();
+		this.answerId=this.GermanId;
 
 	}
 	
@@ -46,7 +48,7 @@ public class Vokabeltrainer {
 	}
 
 	public String getSolution() {
-		return "solution from voc trainer";
+		return this.actVoc[this.answerId];
 	}
 
 	public void initRandomVocabulary() {
@@ -87,13 +89,13 @@ public class Vokabeltrainer {
 			this.askedIds.clear();
 		}
 		while (vocResultSet.next()) {
-			int idx = vocResultSet.getInt(colums[0]);
+			int idx = vocResultSet.getInt(colums.get(0));
 			if(askedIds.contains(idx) || idx==lastIdx)
 				continue;
 			askedIds.add(idx);
-			row.add(Integer.toString(vocResultSet.getInt(colums[0])));
-			for (int i = 1; i < this.colums.length; i++) {
-				row.add(vocResultSet.getString(this.colums[i]));
+			row.add(Integer.toString(vocResultSet.getInt(colums.get(0))));
+			for (int i = 1; i < this.colums.size(); i++) {
+				row.add(vocResultSet.getString(this.colums.get(i)));
 			}
 			break;
 		}
@@ -103,12 +105,16 @@ public class Vokabeltrainer {
 	public String getAllVocSQL() {
 		String sql = "SELECT ";
 		this.colums = this.db.getColumns();
-		for (int i = 0; i < this.colums.length; i++) {
-			sql = sql + this.colums[i];
-			if (i != this.colums.length - 1)
+		for (int i = 0; i < this.colums.size(); i++) {
+			sql = sql + this.colums.get(i);
+			if (i != this.colums.size() - 1)
 				sql = sql + ",";
 		}
 		sql = sql + " FROM " + this.db.getTableName() + " ORDER BY RANDOM()";
 		return sql;
+	}
+	
+	public void determineGermanId() {
+		this.GermanId=this.colums.indexOf("Deutsch");
 	}
 }

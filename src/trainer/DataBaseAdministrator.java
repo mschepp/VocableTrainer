@@ -8,14 +8,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.zip.DataFormatException;
 
 public class DataBaseAdministrator {
 
 	private Connection conn;
 
-	private String[] cols= {};
-	private String[] types= {};
+	private ArrayList<String> cols= new ArrayList<>();
+	private ArrayList<String> types= new ArrayList<>();
 	private String path;
 	private String url;
 	private String tableName;
@@ -39,17 +40,17 @@ public class DataBaseAdministrator {
 	
 		if(dbFile.isFile()) {
 			determineColumns();
-			if(this.cols.length==0) {
-				this.cols = cols;
-				this.types = types;				
+			if(this.cols.size()==0) {
+				this.cols = new ArrayList<>(Arrays.asList(cols));
+				this.types = new ArrayList<>(Arrays.asList(types));				
 			}
 			else {
 				determineTableName();
 				System.out.println("Database already exist. Going to determine columns from table");
 			}
 		}else {			
-			this.cols = cols;
-			this.types = types;
+			this.cols = new ArrayList<>(Arrays.asList(cols));
+			this.types = new ArrayList<>(Arrays.asList(types));
 		}
 	}
 
@@ -61,19 +62,19 @@ public class DataBaseAdministrator {
 		createDb(this.path, this.cols, this.types);
 	}
 
-	public void createDb(String path, String[] cols, String[] types) {
+	public void createDb(String path, ArrayList<String> cols,ArrayList<String> types) {
 		this.conn = null;
 		String sql;
 		this.tableName = "vocabulary";
 		sql = "CREATE TABLE IF NOT EXISTS vocabulary(id INTEGER NOT NULL PRIMARY KEY,\n";
-		for (int i = 0; i < this.cols.length; i++) {
-			if(this.cols[i].equalsIgnoreCase("id")) {
+		for (int i = 0; i < cols.size(); i++) {
+			if(cols.get(i).equalsIgnoreCase("id")) {
 				continue;
 			}
-			sql += this.cols[i];
+			sql += cols.get(i);
 			sql += " ";
-			sql += this.types[i];
-			if (!(i == this.cols.length - 1))
+			sql += types.get(i);
+			if (!(i == cols.size() - 1))
 				sql += ",\n";
 		}
 		sql += ");";
@@ -94,6 +95,10 @@ public class DataBaseAdministrator {
 		}
 
 	}
+	
+	public void createDb(String path, String[] cols, String[] types) {
+		createDb(path, new ArrayList<>(Arrays.asList(cols)), new ArrayList<>(Arrays.asList(types)));
+	}
 
 	public void createDb(String dbName) {
 		String[] cols = { "Japanisch", "Japanisch_Romaji", "Kanji", "Deutsch", "Kanji_Level", "Vokabel_Level",
@@ -109,16 +114,16 @@ public class DataBaseAdministrator {
 
 	public int insertLine(String line) throws DataFormatException {
 		String[] row = line.split("\t");
-		if (row.length > this.cols.length  || row.length < this.cols.length-1)
+		if (row.length > this.cols.size()  || row.length < this.cols.size()-1)
 			throw new DataFormatException("line to short or to long");
 
 		String valuesSql = "";
 		String sql = "INSERT INTO vocabulary (";
 
 		// INSERT INTO vocabulary (id,col1,col2,...) VALUES (null/?,?,?,...);
-		for (int i = 0; i < this.cols.length; i++) {
-			sql += this.cols[i];
-			if (!(i == this.cols.length - 1)) {
+		for (int i = 0; i < this.cols.size(); i++) {
+			sql += this.cols.get(i);
+			if (!(i == this.cols.size() - 1)) {
 				sql += " , ";
 			}
 		}		
@@ -132,7 +137,7 @@ public class DataBaseAdministrator {
 		sql += ") VALUES (";
 		valuesSql += ");";
 
-		if (row.length != this.cols.length ) {
+		if (row.length != this.cols.size() ) {
 			sql += "null,";
 		}
 		sql += valuesSql;
@@ -209,10 +214,9 @@ public class DataBaseAdministrator {
 		}
 	}
 	
-	public String[] determineColumns() {
-		ArrayList<String> res=new ArrayList<>();
+	public ArrayList<String> determineColumns() {
+		ArrayList<String> cols=new ArrayList<>();
 		ArrayList<String> colTypes=new ArrayList<>();
-		String[] result= {};
 		
 		String tableDef=getTableDefinition();
 		tableDef=tableDef.replaceAll("\\t", " ");
@@ -226,37 +230,39 @@ public class DataBaseAdministrator {
 			for(int i=0;i<columns.length;i++) {
 				if(columns[i].contains("(") && (columns[i].toUpperCase()).contains("PRIMARY KEY"))
 					continue;
-				String[] col=columns[i].split(" ");
-				if(col.length==2) {
-					res.add(col[0]);
-					colTypes.add(col[1]);
+				String[] column=columns[i].split(" ");
+				if(column.length==2) {
+					cols.add(column[0]);
+					colTypes.add(column[1]);
 				}
 				else {
 					int j=0;
-					for(;j<col.length;j++) {
-						if(!col[j].isEmpty()) {
-							res.add(col[j]);
+					for(;j<column.length;j++) {
+						if(!column[j].isEmpty()) {
+							cols.add(column[j]);
 							j++;
 							break;
 						}
 					}
-					for(;j<col.length;j++) {
-						if(!col[j].isEmpty()) {
-							colTypes.add(col[j]);
+					for(;j<column.length;j++) {
+						if(!column[j].isEmpty()) {
+							colTypes.add(column[j]);
 							break;
 						}
 					}
 				}
 			}
-			this.cols=res.toArray(result);
-			this.types=colTypes.toArray(result);
+			this.cols=cols;
+			this.types=colTypes;
 		}
 		return this.cols;
 	}
 	
-	public String[] getColumns() {
+	public ArrayList<String> getColumns() {
 		return this.cols;
 	}
+	
+	
 	
 	public ResultSet executeSQLWithResult(String sql) throws SQLException {
 		this.conn = DriverManager.getConnection(this.url);
