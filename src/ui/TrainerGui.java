@@ -214,7 +214,7 @@ public class TrainerGui extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				// TODO Auto-generated method stub
-				showSolution();
+				showSolution("Gesucht wird:\n"+vocTrainer.getSolution());
 			}
 		});
 		
@@ -222,7 +222,7 @@ public class TrainerGui extends Application {
 			@Override
 			public void handle(ActionEvent event) {
 				// TODO Auto-generated method stub
-				check();
+				check(input.getText());
 			}
 
 		});
@@ -281,8 +281,11 @@ public class TrainerGui extends Application {
 	}
 
 
-	public void check() {
-		showSolution();
+	public void check(String text) {
+		if(this.vocTrainer.isRight(text))
+			showSolution("Richtig");
+		else
+			showSolution(text+" ist falsch\nRichtig ist "+this.vocTrainer.getSolution());
 	}
 	
 	
@@ -310,8 +313,8 @@ public class TrainerGui extends Application {
 		resetTextField();
 	}
 	
-	public void showSolution() {
-		this.solution.setText(this.vocTrainer.getSolution());
+	public void showSolution(String text) {
+		this.solution.setText(text);
 	}
 	
 	
