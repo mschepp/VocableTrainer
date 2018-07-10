@@ -30,6 +30,7 @@ import javafx.stage.Stage;
 
 import trainer.JapanischTrainer;
 import trainer.JapanischTrainer.japaneseWriting;
+import trainer.LanguageModi;
 import trainer.Vokabeltrainer;
 
 public class TrainerGui extends Application {
@@ -41,8 +42,9 @@ public class TrainerGui extends Application {
 	private Label actVoc, solution;
 	private Button showSol, check, next;
 	private TextField input = new TextField();
-	private String dbPath = "C:/Users/Melanie_local/workspaceJava-Photon/VokabelTrainer/Database/vokabeln.sql";
+	private String dbPath = System.getProperty("user.dir") + "/Database/vokabeln.sql";
 	private String solutionTextDefault = "Solution";
+	private int col2Width = 255;
 
 	Vokabeltrainer vocTrainer;
 
@@ -51,11 +53,13 @@ public class TrainerGui extends Application {
 		this.vocTrainer = new JapanischTrainer(this.dbPath);
 		Font font = new Font(20);
 		Font font2 = new Font(15);
-		Font font3 = new Font(24);
+		// Font font3 = new Font(24);
+		Font font3 = Font.font("Meiryo", 20);
+		Font font4 = Font.font("Meiryo", 16);
 		this.actVoc = new Label(this.vocTrainer.getActVocable());
 		this.actVoc.setFont(font3);
 		this.solution = new Label(solutionTextDefault);
-		this.solution.setFont(font);
+		this.solution.setFont(font4);
 		this.showSol = new Button("Zeige L" + UMLAUT_OE + "sung");
 		this.showSol.setFont(font2);
 		this.check = new Button("Check/L" + UMLAUT_OE + "sung");
@@ -78,6 +82,7 @@ public class TrainerGui extends Application {
 		primaryStage.setMinHeight(475);
 		primaryStage.setMinWidth(715);
 		this.input.setMinHeight(425 / 3.);
+		this.input.setMinWidth(col2Width);
 
 		// menu
 		MenuBar menuBar;
@@ -130,11 +135,11 @@ public class TrainerGui extends Application {
 		// center bPane textfield,buttons label
 		GridPane gPane = new GridPane();
 
-		ColumnConstraints colConstrain = new ColumnConstraints();
-		colConstrain.setPercentWidth(33.3);
+		ColumnConstraints colConstrain = new ColumnConstraints(col2Width - 50);
+		ColumnConstraints col2Constrain = new ColumnConstraints(col2Width);
 		RowConstraints rowConstrain = new RowConstraints(425 / 3.);
 		rowConstrain.setPercentHeight(33);
-		gPane.getColumnConstraints().addAll(colConstrain, colConstrain, colConstrain);
+		gPane.getColumnConstraints().addAll(colConstrain, col2Constrain, colConstrain);
 		gPane.getRowConstraints().addAll(rowConstrain, rowConstrain, rowConstrain);
 
 		gPane.add(this.actVoc, 1, 0);
@@ -257,9 +262,7 @@ public class TrainerGui extends Application {
 			if ((this.vocTrainer.getActVocInfo()[mod.getIdx()] != null
 					&& !this.vocTrainer.getActVocInfo()[mod.getIdx()].equals(""))) {
 				this.vocTrainer.setAskId(mod.getIdx());
-				this.vocTrainer.setLanguageId(mod.getIdx());
-			}
-			else {
+			} else {
 				errorWindow("Kein Eintrag für den gew" + UMLAUT_AE + "hlten Modus in der Datenbank.", 500, 100);
 			}
 		} else {
@@ -268,7 +271,7 @@ public class TrainerGui extends Application {
 		refresh();
 	}
 
-	public void setModusAnswer(japaneseWriting mod) {
+	public void setModusAnswer(LanguageModi mod) {
 		if (mod.getIdx() == this.vocTrainer.getAskId()) {
 			errorWindow("F" + UMLAUT_UE + "r Antwort und Frage wurde der gleiche Modus gew" + UMLAUT_AE + "hlt. "
 					+ "Bitte unterschiedliche Modi w" + UMLAUT_AE + "hlen.", 500, 100);
@@ -278,7 +281,6 @@ public class TrainerGui extends Application {
 			if ((this.vocTrainer.getActVocInfo()[mod.getIdx()] != null
 					&& !this.vocTrainer.getActVocInfo()[mod.getIdx()].equals(""))) {
 				this.vocTrainer.setAnswerId(mod.getIdx());
-				this.vocTrainer.setLanguageId(mod.getIdx());
 				refresh();
 			}
 		} else {
@@ -318,24 +320,24 @@ public class TrainerGui extends Application {
 		WebView wv = new WebView();
 		WebEngine engine = wv.getEngine();
 		wv.setBlendMode(BlendMode.MULTIPLY);
-		wv.setPrefHeight(60);
-		wv.setMinWidth(238);
+		wv.setPrefHeight(70);
+		wv.setMinWidth(col2Width);
+		String html_center = "<html> <center> ";
+		String html_font = "<font style=\"font-family: Meiryo\" size=3em ";
 		if (this.vocTrainer.isRight(text)) {
-			engine.loadContent("<html> <center> <font size=4pt>" + this.input.getText()
-					+ " ist </font><font size=4pt color=green>Richtig</font> </center></html>");
+			engine.loadContent(html_center + html_font + this.input.getText() + " ist </font>" + html_font
+					+ " color=green>Richtig</font> </center></html>");
 			this.input.setStyle("-fx-background-color: green;");
 
 		} else {
 			if (this.vocTrainer.isPossibleSolution(text)) {
-				engine.loadContent("<html> <center> <font size=4pt color=orange>" + this.input.getText()
+				engine.loadContent(html_center + html_font + "color=orange>" + this.input.getText()
 						+ " ist ok<br> aber nicht gesucht</font> </center></html>");
 				this.input.setStyle("-fx-background-color: orange;");
-			}
-			else {
-				engine.loadContent("<html> <center> <font size=4pt>" + text
-						+ " ist</font> <font size=4pt color=red>falsch</font> <br>" + " <font size=4pt>"
-						+ this.vocTrainer.getSolution() + " ist </font>"
-						+ "<font size=4pt color=green>Richtig</font></center></html>");
+			} else {
+				engine.loadContent(html_center + html_font + ">" + text + " ist</font> " + html_font
+						+ "color=red>falsch</font> <br>" + html_font + ">" + this.vocTrainer.getSolution()
+						+ " ist </font>" + html_font + "color=green>Richtig</font></center></html>");
 				this.input.setStyle("-fx-background-color: red;");
 			}
 		}

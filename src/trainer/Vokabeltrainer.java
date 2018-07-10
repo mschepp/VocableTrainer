@@ -6,10 +6,9 @@ import java.util.ArrayList;
 
 public class Vokabeltrainer {
 
-	protected int languageId = 1;
 	protected int askId = 1;
 	protected int GermanId = -1;
-	protected int answerId = -11;
+	protected int answerId = -1;
 	private DataBaseAdministrator db;
 	protected ArrayList<String> colums;
 	protected String[] actVoc;
@@ -28,9 +27,6 @@ public class Vokabeltrainer {
 
 	}
 
-	public void setLanguageId(int languageId) {
-		this.languageId = languageId;
-	}
 
 	public int getAskId() {
 		return askId;
