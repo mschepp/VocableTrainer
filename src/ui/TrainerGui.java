@@ -34,6 +34,10 @@ import trainer.Vokabeltrainer;
 
 public class TrainerGui extends Application {
 
+	static String UMLAUT_OE = "\u00f6";
+	static String UMLAUT_UE = "\u00fc";
+	static String UMLAUT_AE = "\u00e4";
+
 	private Label actVoc, solution;
 	private Button showSol, check, next;
 	private TextField input = new TextField();
@@ -52,11 +56,11 @@ public class TrainerGui extends Application {
 		this.actVoc.setFont(font3);
 		this.solution = new Label(solutionTextDefault);
 		this.solution.setFont(font);
-		this.showSol = new Button("Zeige L\u00f6sung");
+		this.showSol = new Button("Zeige L" + UMLAUT_OE + "sung");
 		this.showSol.setFont(font2);
-		this.check = new Button("Check/L\u00f6sung");
+		this.check = new Button("Check/L" + UMLAUT_OE + "sung");
 		this.check.setFont(font2);
-		this.next = new Button("N\u00e4chste Vokabel");
+		this.next = new Button("N" + UMLAUT_AE + "chste Vokabel");
 		this.next.setFont(font2);
 		this.input = new TextField();
 		this.input.setFont(font);
@@ -81,7 +85,7 @@ public class TrainerGui extends Application {
 
 		// init menu
 		menuBar = new MenuBar();
-		menu = new Menu("Men\u00fc");
+		menu = new Menu("Men" + UMLAUT_UE);
 		modus = new Menu("Modus");
 
 		answerMenu = new Menu("answerModus");
@@ -246,32 +250,39 @@ public class TrainerGui extends Application {
 
 	}
 
-	/**
-	 * @TODO need to be implemented
-	 * @param mod
-	 */
+	//
 	public void setModusQuest(japaneseWriting mod) {
 		if (this.vocTrainer.isGermanSearched()) {
-			this.vocTrainer.setAskId(mod.getIdx());
-			this.vocTrainer.setLanguageId(mod.getIdx());
+			if ((this.vocTrainer.getActVocInfo()[mod.getIdx()] != null
+					&& !this.vocTrainer.getActVocInfo()[mod.getIdx()].equals(""))) {
+				this.vocTrainer.setAskId(mod.getIdx());
+				this.vocTrainer.setLanguageId(mod.getIdx());
+			}
+			else {
+				errorWindow("Kein Eintrag für den gew" + UMLAUT_AE + "hlten Modus in der Datenbank.", 500, 100);
+			}
 		} else {
 			errorWindow("Deutsch wird gefragt. Deutsch hat keine verschiedene Modi", 500, 100);
 		}
 		refresh();
 	}
 
-	/**
-	 * @TODO need to be implemented
-	 * @param mod
-	 */
 	public void setModusAnswer(japaneseWriting mod) {
-		if (!this.vocTrainer.isGermanSearched()) {
-			this.vocTrainer.setAnswerId(mod.getIdx());
-			this.vocTrainer.setLanguageId(mod.getIdx());
-		} else {
-			errorWindow("Deutsch wird gesucht. Deutsch hat keine verschiedene Modi", 500, 100);
+		if (mod.getIdx() == this.vocTrainer.getAskId()) {
+			errorWindow("F" + UMLAUT_UE + "r Antwort und Frage wurde der gleiche Modus gew" + UMLAUT_AE + "hlt. "
+					+ "Bitte unterschiedliche Modi w" + UMLAUT_AE + "hlen.", 500, 100);
+			return;
 		}
-		refresh();
+		if (mod.getIdx() != -1) {
+			if ((this.vocTrainer.getActVocInfo()[mod.getIdx()] != null
+					&& !this.vocTrainer.getActVocInfo()[mod.getIdx()].equals(""))) {
+				this.vocTrainer.setAnswerId(mod.getIdx());
+				this.vocTrainer.setLanguageId(mod.getIdx());
+				refresh();
+			}
+		} else {
+			errorWindow("Kein Eintrag für den gew" + UMLAUT_AE + "hlten Modus in der Datenbank.", 500, 100);
+		}
 	}
 
 	public void resetTextField() {
@@ -284,6 +295,7 @@ public class TrainerGui extends Application {
 
 	private void showDialog() {
 		FileChooser chooseDB = new FileChooser();
+		chooseDB.setInitialDirectory(new File("./"));
 		File chosen = chooseDB.showOpenDialog(new Stage());
 		// is null if no file selected
 		if (chosen != null) {

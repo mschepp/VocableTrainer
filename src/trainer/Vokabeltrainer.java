@@ -107,7 +107,7 @@ public class Vokabeltrainer {
 		}
 		while (vocResultSet.next()) {
 			int idx = vocResultSet.getInt(colums.get(0));
-			if (askedIds.contains(idx) || idx == lastIdx)
+			if (this.allVocN!=1 &&(askedIds.contains(idx) || idx == lastIdx))
 				continue;
 			askedIds.add(idx);
 			row.add(Integer.toString(vocResultSet.getInt(colums.get(0))));
@@ -165,6 +165,10 @@ public class Vokabeltrainer {
 	
 	public boolean isGermanSearched() {
 		return this.germanSearched;
+	}
+
+	public String[] getActVocInfo() {
+		return actVoc;
 	}
 	
 	
