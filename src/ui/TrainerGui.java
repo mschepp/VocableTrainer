@@ -263,7 +263,7 @@ public class TrainerGui extends Application {
 				errorWindow("Kein Eintrag für den gew" + UMLAUT_AE + "hlten Modus in der Datenbank.", 500, 100);
 			}
 		} else {
-			errorWindow("Deutsch wird gefragt. Deutsch hat keine verschiedene Modi", 500, 100);
+			errorWindow("Deutsch ist gegeben. Deutsch hat keine verschiedene Modi.", 500, 100);
 		}
 		refresh();
 	}
