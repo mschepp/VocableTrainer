@@ -16,7 +16,7 @@ public class Vokabeltrainer {
 	private long allVocN = 0;
 	private ArrayList<Integer> askedIds = new ArrayList<>();
 	private String[] help = {};
-	protected boolean germanSearched=true;
+	protected boolean germanSearched = true;
 
 	public Vokabeltrainer(String dbPath) {
 		super();
@@ -27,7 +27,7 @@ public class Vokabeltrainer {
 		this.answerId = this.GermanId;
 
 	}
-	
+
 	public void setLanguageId(int languageId) {
 		this.languageId = languageId;
 	}
@@ -101,13 +101,13 @@ public class Vokabeltrainer {
 		ArrayList<String> row = new ArrayList<>();
 		ResultSet vocResultSet = this.db.executeSQLWithResult(sql);
 		int lastIdx = -1;
-		if (this.askedIds.size() == this.allVocN && this.allVocN!=0) {
+		if (this.askedIds.size() == this.allVocN && this.allVocN != 0) {
 			lastIdx = this.askedIds.get(askedIds.size() - 1);
 			this.askedIds.clear();
 		}
 		while (vocResultSet.next()) {
 			int idx = vocResultSet.getInt(colums.get(0));
-			if (this.allVocN!=1 &&(askedIds.contains(idx) || idx == lastIdx))
+			if (this.allVocN != 1 && (askedIds.contains(idx) || idx == lastIdx))
 				continue;
 			askedIds.add(idx);
 			row.add(Integer.toString(vocResultSet.getInt(colums.get(0))));
@@ -160,9 +160,9 @@ public class Vokabeltrainer {
 		int help = this.askId;
 		this.askId = this.answerId;
 		this.answerId = help;
-		this.germanSearched=!this.germanSearched;
+		this.germanSearched = !this.germanSearched;
 	}
-	
+
 	public boolean isGermanSearched() {
 		return this.germanSearched;
 	}
@@ -170,7 +170,5 @@ public class Vokabeltrainer {
 	public String[] getActVocInfo() {
 		return actVoc;
 	}
-	
-	
 
 }

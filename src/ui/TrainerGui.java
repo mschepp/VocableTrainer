@@ -64,6 +64,7 @@ public class TrainerGui extends Application {
 		this.next.setFont(font2);
 		this.input = new TextField();
 		this.input.setFont(font);
+		this.input.setAlignment(Pos.CENTER);
 
 	}
 
@@ -287,6 +288,7 @@ public class TrainerGui extends Application {
 
 	public void resetTextField() {
 		this.input.clear();
+		this.input.setStyle("-fx-inner-background-color: white;");
 	}
 
 	public void refresh() {
@@ -321,16 +323,21 @@ public class TrainerGui extends Application {
 		if (this.vocTrainer.isRight(text)) {
 			engine.loadContent("<html> <center> <font size=4pt>" + this.input.getText()
 					+ " ist </font><font size=4pt color=green>Richtig</font> </center></html>");
+			this.input.setStyle("-fx-background-color: green;");
 
 		} else {
-			if (this.vocTrainer.isPossibleSolution(text))
+			if (this.vocTrainer.isPossibleSolution(text)) {
 				engine.loadContent("<html> <center> <font size=4pt color=orange>" + this.input.getText()
 						+ " ist ok<br> aber nicht gesucht</font> </center></html>");
-			else
+				this.input.setStyle("-fx-background-color: orange;");
+			}
+			else {
 				engine.loadContent("<html> <center> <font size=4pt>" + text
 						+ " ist</font> <font size=4pt color=red>falsch</font> <br>" + " <font size=4pt>"
 						+ this.vocTrainer.getSolution() + " ist </font>"
 						+ "<font size=4pt color=green>Richtig</font></center></html>");
+				this.input.setStyle("-fx-background-color: red;");
+			}
 		}
 		showSolution(wv);
 	}
@@ -354,6 +361,7 @@ public class TrainerGui extends Application {
 	public void getNext() {
 		this.actVoc.setText(this.vocTrainer.getNextVocable());
 		this.solution.setText(this.solutionTextDefault);
+		this.solution.setContentDisplay(ContentDisplay.TEXT_ONLY);
 		resetTextField();
 	}
 
