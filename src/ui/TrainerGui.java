@@ -2,7 +2,6 @@ package ui;
 
 import java.io.File;
 
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -11,19 +10,24 @@ import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.BlendMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.RowConstraints;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+
 import trainer.JapanischTrainer;
 import trainer.JapanischTrainer.japaneseWriting;
 import trainer.Vokabeltrainer;
@@ -41,11 +45,11 @@ public class TrainerGui extends Application {
 	public TrainerGui() {
 		// TODO Auto-generated constructor stub
 		this.vocTrainer = new JapanischTrainer(this.dbPath);
-		Font font=new Font(20);
-		Font font2=new Font(15);
-		Font font3=new Font(24);
+		Font font = new Font(20);
+		Font font2 = new Font(15);
+		Font font3 = new Font(24);
 		this.actVoc = new Label(this.vocTrainer.getActVocable());
-		this.actVoc.setFont(font3);		
+		this.actVoc.setFont(font3);
 		this.solution = new Label(solutionTextDefault);
 		this.solution.setFont(font);
 		this.showSol = new Button("Zeige L\u00f6sung");
@@ -56,7 +60,6 @@ public class TrainerGui extends Application {
 		this.next.setFont(font2);
 		this.input = new TextField();
 		this.input.setFont(font);
-		
 
 	}
 
@@ -201,23 +204,22 @@ public class TrainerGui extends Application {
 				setModusQuest(japaneseWriting.ROMAJI);
 			}
 		});
-		
-		
+
 		this.next.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				getNext();
 			}
 		});
-		
-		this.showSol.setOnAction( new EventHandler<ActionEvent>() {
+
+		this.showSol.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
 				// TODO Auto-generated method stub
-				showSolution("Gesucht wird:\n"+vocTrainer.getSolution());
+				showSolution("Gesucht wird:\n" + vocTrainer.getSolution());
 			}
 		});
-		
+
 		this.check.setOnAction(new EventHandler<ActionEvent>() {
 			@Override
 			public void handle(ActionEvent event) {
@@ -256,8 +258,7 @@ public class TrainerGui extends Application {
 	public void resetTextField() {
 		this.input.clear();
 	}
-	
-	
+
 	public void refresh() {
 		this.actVoc.setText(this.vocTrainer.getActVocable());
 	}
@@ -270,9 +271,9 @@ public class TrainerGui extends Application {
 			String newPath = chosen.getPath();
 			if (newPath.endsWith(".sql")) {
 				this.dbPath = newPath;
-				this.vocTrainer=new JapanischTrainer(this.dbPath);
+				this.vocTrainer = new JapanischTrainer(this.dbPath);
 				refresh();
-				//System.out.println(newPath);
+				// System.out.println(newPath);
 			} else {
 				errorWindow("Wrong file extension");
 
@@ -280,15 +281,26 @@ public class TrainerGui extends Application {
 		}
 	}
 
-
 	public void check(String text) {
-		if(this.vocTrainer.isRight(text))
-			showSolution("Richtig");
-		else
-			showSolution(text+" ist falsch\nRichtig ist "+this.vocTrainer.getSolution());
+		WebView wv = new WebView();
+		WebEngine engine = wv.getEngine();
+		wv.setBlendMode(BlendMode.MULTIPLY);
+		wv.setPrefHeight(50);
+		if (this.vocTrainer.isRight(text)) {
+			engine.loadContent("<html> <center> <font size=4pt>" + this.input.getText()
+					+ " ist </font><font size=4pt color=green>Richtig</font> </center></html>");
+
+		} else {
+			if (this.vocTrainer.isPossibleSolution(text))
+				engine.loadContent("<html> <center> <font size=4pt color=orange>" + this.input.getText()
+						+ " ist ok<br> aber nicht gesucht</font> </center></html>");
+			else
+				engine.loadContent("<html> <center> <font size=4pt>" + text
+						+ " ist</font> <font size=4pt color=red>falsch</font> </center></html>");
+		}
+		showSolution(wv);
 	}
-	
-	
+
 	public void errorWindow(String messages, double width, double height) {
 		Text errorMess = new Text(messages);
 		BorderPane errorPane = new BorderPane();
@@ -304,25 +316,28 @@ public class TrainerGui extends Application {
 	public void errorWindow(String messages) {
 		errorWindow(messages, 200, 100);
 	}
-	
-	
-	
+
 	public void getNext() {
 		this.actVoc.setText(this.vocTrainer.getNextVocable());
 		this.solution.setText(this.solutionTextDefault);
 		resetTextField();
 	}
-	
+
 	public void showSolution(String text) {
 		this.solution.setText(text);
+		this.solution.setContentDisplay(ContentDisplay.TEXT_ONLY);
 	}
-	
-	
+
+	public void showSolution(WebView formText) {
+		this.solution.setGraphic(formText);
+		this.solution.setContentDisplay(ContentDisplay.GRAPHIC_ONLY);
+	}
+
 	/**
 	 * @TODO need to be implemented
 	 */
 	public void reverse() {
-		
+
 	}
 
 	public static void main(String[] args) {

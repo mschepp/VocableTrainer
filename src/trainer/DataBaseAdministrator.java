@@ -291,6 +291,4 @@ public class DataBaseAdministrator {
 		return this.tableName;
 	}
 
-	
-	
 }

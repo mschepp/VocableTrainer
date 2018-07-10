@@ -122,18 +122,16 @@ public class Vokabeltrainer {
 
 	public boolean isPossibleSolution(String text) {
 		String sql = "SELECT " + this.colums.get(this.answerId) + " FROM " + this.db.getTableName() + " WHERE "
-				+ this.colums.get(this.answerId) + " LIKE '%" + this.actVoc[this.languageId] + "%';";
+				+ this.colums.get(this.languageId) + " LIKE '%" + this.actVoc[this.languageId] + "%';";
 		try {
-			ResultSet rs =this.db.executeSQLWithResult(sql);
-			while(rs.next()) {
-				if((text.trim()).equals(rs.getString(this.colums.get(this.answerId))))
+			ResultSet rs = this.db.executeSQLWithResult(sql);
+			while (rs.next()) {
+				if ((text.trim()).equals(rs.getString(this.colums.get(this.answerId))))
 					return true;
 			}
-		}
-		catch (SQLException e) {
+		} catch (SQLException e) {
 			System.out.println(e.getMessage());
-		}
-		finally {
+		} finally {
 			this.db.closeConnection();
 		}
 		return false;
