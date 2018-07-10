@@ -15,14 +15,13 @@ public class DataBaseAdministrator {
 
 	private Connection conn;
 
-	private ArrayList<String> cols= new ArrayList<>();
-	private ArrayList<String> types= new ArrayList<>();
+	private ArrayList<String> cols = new ArrayList<>();
+	private ArrayList<String> types = new ArrayList<>();
 	private String path;
 	private String url;
 	private String tableName;
-	//private PreparedStatement act_stmt_prep;
+	// private PreparedStatement act_stmt_prep;
 	// Statement act_stmt;
-
 
 	public DataBaseAdministrator(String path) {
 		super();
@@ -36,19 +35,18 @@ public class DataBaseAdministrator {
 		super();
 		this.path = path;
 		this.url = "jdbc:sqlite:" + this.path;
-		File dbFile= new File(this.path);
-	
-		if(dbFile.isFile()) {
+		File dbFile = new File(this.path);
+
+		if (dbFile.isFile()) {
 			determineColumns();
-			if(this.cols.size()==0) {
+			if (this.cols.size() == 0) {
 				this.cols = new ArrayList<>(Arrays.asList(cols));
-				this.types = new ArrayList<>(Arrays.asList(types));				
-			}
-			else {
+				this.types = new ArrayList<>(Arrays.asList(types));
+			} else {
 				determineTableName();
 				System.out.println("Database already exist. Going to determine columns from table");
 			}
-		}else {			
+		} else {
 			this.cols = new ArrayList<>(Arrays.asList(cols));
 			this.types = new ArrayList<>(Arrays.asList(types));
 		}
@@ -62,13 +60,13 @@ public class DataBaseAdministrator {
 		createDb(this.path, this.cols, this.types);
 	}
 
-	public void createDb(String path, ArrayList<String> cols,ArrayList<String> types) {
+	public void createDb(String path, ArrayList<String> cols, ArrayList<String> types) {
 		this.conn = null;
 		String sql;
 		this.tableName = "vocabulary";
 		sql = "CREATE TABLE IF NOT EXISTS vocabulary(id INTEGER NOT NULL PRIMARY KEY,\n";
 		for (int i = 0; i < cols.size(); i++) {
-			if(cols.get(i).equalsIgnoreCase("id")) {
+			if (cols.get(i).equalsIgnoreCase("id")) {
 				continue;
 			}
 			sql += cols.get(i);
@@ -81,7 +79,7 @@ public class DataBaseAdministrator {
 
 		try {
 			this.conn = DriverManager.getConnection(this.url);
-			Statement stmt= this.conn.createStatement();
+			Statement stmt = this.conn.createStatement();
 			// create a new table
 			stmt.execute(sql);
 			this.conn.close();
@@ -95,7 +93,7 @@ public class DataBaseAdministrator {
 		}
 
 	}
-	
+
 	public void createDb(String path, String[] cols, String[] types) {
 		createDb(path, new ArrayList<>(Arrays.asList(cols)), new ArrayList<>(Arrays.asList(types)));
 	}
@@ -114,7 +112,7 @@ public class DataBaseAdministrator {
 
 	public int insertLine(String line) throws DataFormatException {
 		String[] row = line.split("\t");
-		if (row.length > this.cols.size()  || row.length < this.cols.size()-1)
+		if (row.length > this.cols.size() || row.length < this.cols.size() - 1)
 			throw new DataFormatException("line to short or to long");
 
 		String valuesSql = "";
@@ -126,7 +124,7 @@ public class DataBaseAdministrator {
 			if (!(i == this.cols.size() - 1)) {
 				sql += " , ";
 			}
-		}		
+		}
 		for (int i = 0; i < row.length; i++) {
 			valuesSql += "?";
 			if (!(i == row.length - 1)) {
@@ -137,7 +135,7 @@ public class DataBaseAdministrator {
 		sql += ") VALUES (";
 		valuesSql += ");";
 
-		if (row.length != this.cols.size() ) {
+		if (row.length != this.cols.size()) {
 			sql += "null,";
 		}
 		sql += valuesSql;
@@ -152,8 +150,6 @@ public class DataBaseAdministrator {
 		}
 		return -1;
 	}
-
-	
 
 	public void insertMultLine(String multLine) throws DataFormatException {
 		String[] lines = multLine.split(System.lineSeparator());
@@ -179,25 +175,23 @@ public class DataBaseAdministrator {
 
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
-		}
-		finally {
+		} finally {
 			closeConnection();
 		}
 	}
-	
+
 	public String getTableDefinition() {
-		String sql="SELECT sql FROM sqlite_master WHERE  type= 'table'";
+		String sql = "SELECT sql FROM sqlite_master WHERE  type= 'table'";
 		try {
 			ResultSet rs = executeSQLWithResult(sql);
-			if(rs.next())
+			if (rs.next())
 				return rs.getString("sql");
-			else return "";
-			
+			else
+				return "";
 
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
-		}
-		finally {
+		} finally {
 			closeConnection();
 		}
 		return "";
@@ -213,64 +207,61 @@ public class DataBaseAdministrator {
 			System.out.println(ex.getMessage());
 		}
 	}
-	
+
 	public ArrayList<String> determineColumns() {
-		ArrayList<String> cols=new ArrayList<>();
-		ArrayList<String> colTypes=new ArrayList<>();
-		
-		String tableDef=getTableDefinition();
-		tableDef=tableDef.replaceAll("\\t", " ");
-		tableDef=tableDef.replaceAll("\\n", "");
-		tableDef=tableDef.replaceAll("\\r", "");
-		tableDef=tableDef.replaceAll("\\)", "");
-		tableDef=tableDef.replaceAll("`", "");
-		if(!tableDef.isEmpty()) {
-			String columnString=tableDef.split("\\(",2)[1];
-			String[] columns=columnString.split(",");
-			for(int i=0;i<columns.length;i++) {
-				if(columns[i].contains("(") && (columns[i].toUpperCase()).contains("PRIMARY KEY"))
+		ArrayList<String> cols = new ArrayList<>();
+		ArrayList<String> colTypes = new ArrayList<>();
+
+		String tableDef = getTableDefinition();
+		tableDef = tableDef.replaceAll("\\t", " ");
+		tableDef = tableDef.replaceAll("\\n", "");
+		tableDef = tableDef.replaceAll("\\r", "");
+		tableDef = tableDef.replaceAll("\\)", "");
+		tableDef = tableDef.replaceAll("`", "");
+		if (!tableDef.isEmpty()) {
+			String columnString = tableDef.split("\\(", 2)[1];
+			String[] columns = columnString.split(",");
+			for (int i = 0; i < columns.length; i++) {
+				if (columns[i].contains("(") && (columns[i].toUpperCase()).contains("PRIMARY KEY"))
 					continue;
-				String[] column=columns[i].split(" ");
-				if(column.length==2) {
+				String[] column = columns[i].split(" ");
+				if (column.length == 2) {
 					cols.add(column[0]);
 					colTypes.add(column[1]);
-				}
-				else {
-					int j=0;
-					for(;j<column.length;j++) {
-						if(!column[j].isEmpty()) {
+				} else {
+					int j = 0;
+					for (; j < column.length; j++) {
+						if (!column[j].isEmpty()) {
 							cols.add(column[j]);
 							j++;
 							break;
 						}
 					}
-					for(;j<column.length;j++) {
-						if(!column[j].isEmpty()) {
+					for (; j < column.length; j++) {
+						if (!column[j].isEmpty()) {
 							colTypes.add(column[j]);
 							break;
 						}
 					}
 				}
 			}
-			this.cols=cols;
-			this.types=colTypes;
+			this.cols = cols;
+			this.types = colTypes;
 		}
 		return this.cols;
 	}
-	
+
 	public ArrayList<String> getColumns() {
 		return this.cols;
 	}
-	
-	
-	
+
 	public ResultSet executeSQLWithResult(String sql) throws SQLException {
 		this.conn = DriverManager.getConnection(this.url);
 		PreparedStatement stmt_prep = this.conn.prepareStatement(sql);
 		ResultSet rs = stmt_prep.executeQuery();
 		return rs;
 	}
-	
+
 	public int executeUpdateSQL(String sql, String[] row) throws SQLException {
 		this.conn = DriverManager.getConnection(this.url);
 		// Statement stmt = this.conn.createStatement();
@@ -281,9 +272,9 @@ public class DataBaseAdministrator {
 		}
 		return stmt_prep.executeUpdate();
 	}
-	
+
 	public int executeUpdateSQL(String sql) throws SQLException {
-		String[] row= {};
+		String[] row = {};
 		return executeUpdateSQL(sql, row);
 	}
 

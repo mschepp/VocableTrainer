@@ -251,7 +251,13 @@ public class TrainerGui extends Application {
 	 * @param mod
 	 */
 	public void setModusQuest(japaneseWriting mod) {
-		System.out.println("quest mod");
+		if (this.vocTrainer.isGermanSearched()) {
+			this.vocTrainer.setAskId(mod.getIdx());
+			this.vocTrainer.setLanguageId(mod.getIdx());
+		} else {
+			errorWindow("Deutsch wird gefragt. Deutsch hat keine verschiedene Modi", 500, 100);
+		}
+		refresh();
 	}
 
 	/**
@@ -259,7 +265,13 @@ public class TrainerGui extends Application {
 	 * @param mod
 	 */
 	public void setModusAnswer(japaneseWriting mod) {
-		System.out.println("answer mod");
+		if (!this.vocTrainer.isGermanSearched()) {
+			this.vocTrainer.setAnswerId(mod.getIdx());
+			this.vocTrainer.setLanguageId(mod.getIdx());
+		} else {
+			errorWindow("Deutsch wird gesucht. Deutsch hat keine verschiedene Modi", 500, 100);
+		}
+		refresh();
 	}
 
 	public void resetTextField() {

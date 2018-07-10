@@ -16,15 +16,36 @@ public class Vokabeltrainer {
 	private long allVocN = 0;
 	private ArrayList<Integer> askedIds = new ArrayList<>();
 	private String[] help = {};
+	protected boolean germanSearched=true;
 
 	public Vokabeltrainer(String dbPath) {
 		super();
 		this.db = new DataBaseAdministrator(dbPath);
-		this.colums = db.determineColumns();
+		this.colums = db.getColumns();
 		this.initRandomVocabulary();
 		determineGermanId();
 		this.answerId = this.GermanId;
 
+	}
+	
+	public void setLanguageId(int languageId) {
+		this.languageId = languageId;
+	}
+
+	public int getAskId() {
+		return askId;
+	}
+
+	public void setAskId(int askId) {
+		this.askId = askId;
+	}
+
+	public int getAnswerId() {
+		return answerId;
+	}
+
+	public void setAnswerId(int answerId) {
+		this.answerId = answerId;
 	}
 
 	public String getActVocable() {
@@ -80,7 +101,7 @@ public class Vokabeltrainer {
 		ArrayList<String> row = new ArrayList<>();
 		ResultSet vocResultSet = this.db.executeSQLWithResult(sql);
 		int lastIdx = -1;
-		if (this.askedIds.size() == this.allVocN) {
+		if (this.askedIds.size() == this.allVocN && this.allVocN!=0) {
 			lastIdx = this.askedIds.get(askedIds.size() - 1);
 			this.askedIds.clear();
 		}
@@ -139,6 +160,13 @@ public class Vokabeltrainer {
 		int help = this.askId;
 		this.askId = this.answerId;
 		this.answerId = help;
+		this.germanSearched=!this.germanSearched;
 	}
+	
+	public boolean isGermanSearched() {
+		return this.germanSearched;
+	}
+	
+	
 
 }

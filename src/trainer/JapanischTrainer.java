@@ -24,7 +24,18 @@ public class JapanischTrainer extends Vokabeltrainer {
 		japaneseWriting.KANJI.setIdx(this.colums.indexOf("Kanji"));
 		japaneseWriting.ROMAJI.setIdx(this.colums.indexOf("Romaji"));
 
-		// TODO Auto-generated constructor stub
+		if (japaneseWriting.KANA.getIdx() != -1) {
+			this.askId = japaneseWriting.KANA.getIdx();
+			this.languageId = japaneseWriting.KANA.getIdx();
+		} else if (japaneseWriting.KANJI.getIdx() != -1) {
+			this.askId = japaneseWriting.KANJI.getIdx();
+			this.languageId = japaneseWriting.KANJI.getIdx();
+		} else if (japaneseWriting.ROMAJI.getIdx() != -1) {
+			this.askId = japaneseWriting.ROMAJI.getIdx();
+			this.languageId = japaneseWriting.ROMAJI.getIdx();
+		} else
+			throw new RuntimeException("Database needs a column with the name Kana, Kanji or Romji.");
+
 	}
 
 }
