@@ -69,15 +69,15 @@ public class TrainerGui extends Application {
 
 		primaryStage.setTitle("Vokabeltrainer");
 		BorderPane bPane = new BorderPane();
-		Scene scene = new Scene(bPane, 675, 475);
-		primaryStage.setMinHeight(440);
-		primaryStage.setMinWidth(670);
+		Scene scene = new Scene(bPane, 715, 475);
+		primaryStage.setMinHeight(475);
+		primaryStage.setMinWidth(715);
 		this.input.setMinHeight(425 / 3.);
 
 		// menu
 		MenuBar menuBar;
 		Menu menu, modus, answerMenu, questMenu;
-		MenuItem exit, dbAction, reverse, kanjiQuest, kanjiAnswer, kanaQuest, kanaAnswer, romajiQuest, romajiAnswer;
+		MenuItem exit, dbAction, reverseItem, kanjiQuest, kanjiAnswer, kanaQuest, kanaAnswer, romajiQuest, romajiAnswer;
 
 		// init menu
 		menuBar = new MenuBar();
@@ -90,7 +90,7 @@ public class TrainerGui extends Application {
 		// menuitems
 		exit = new MenuItem("exit");
 		dbAction = new MenuItem("Database");
-		reverse = new MenuItem("reverse");
+		reverseItem = new MenuItem("reverse");
 
 		kanaAnswer = new MenuItem("Kana");
 		kanaQuest = new MenuItem("Kana");
@@ -108,7 +108,7 @@ public class TrainerGui extends Application {
 		menu.getItems().add(dbAction);
 		menu.getItems().add(exit);
 
-		modus.getItems().add(reverse);
+		modus.getItems().add(reverseItem);
 		modus.getItems().add(answerMenu);
 		modus.getItems().add(questMenu);
 
@@ -229,6 +229,13 @@ public class TrainerGui extends Application {
 
 		});
 
+		reverseItem.setOnAction(new EventHandler<ActionEvent>() {
+			@Override
+			public void handle(ActionEvent event) {
+				reverse();
+			}
+		});
+
 		primaryStage.setScene(scene);
 		primaryStage.setOnCloseRequest(e -> {
 			Platform.exit();
@@ -285,7 +292,8 @@ public class TrainerGui extends Application {
 		WebView wv = new WebView();
 		WebEngine engine = wv.getEngine();
 		wv.setBlendMode(BlendMode.MULTIPLY);
-		wv.setPrefHeight(50);
+		wv.setPrefHeight(60);
+		wv.setMinWidth(238);
 		if (this.vocTrainer.isRight(text)) {
 			engine.loadContent("<html> <center> <font size=4pt>" + this.input.getText()
 					+ " ist </font><font size=4pt color=green>Richtig</font> </center></html>");
@@ -296,7 +304,9 @@ public class TrainerGui extends Application {
 						+ " ist ok<br> aber nicht gesucht</font> </center></html>");
 			else
 				engine.loadContent("<html> <center> <font size=4pt>" + text
-						+ " ist</font> <font size=4pt color=red>falsch</font> </center></html>");
+						+ " ist</font> <font size=4pt color=red>falsch</font> <br>" + " <font size=4pt>"
+						+ this.vocTrainer.getSolution() + " ist </font>"
+						+ "<font size=4pt color=green>Richtig</font></center></html>");
 		}
 		showSolution(wv);
 	}
@@ -337,6 +347,8 @@ public class TrainerGui extends Application {
 	 * @TODO need to be implemented
 	 */
 	public void reverse() {
+		this.vocTrainer.reverse();
+		refresh();
 
 	}
 

@@ -6,13 +6,12 @@ import java.util.ArrayList;
 
 public class Vokabeltrainer {
 
-	private String dbPath;
 	protected int languageId = 1;
+	protected int askId = 1;
 	protected int GermanId = -1;
-	protected int answerId = -1;
+	protected int answerId = -11;
 	private DataBaseAdministrator db;
-	private ResultSet actVocResultSet;
-	private ArrayList<String> colums;
+	protected ArrayList<String> colums;
 	protected String[] actVoc;
 	private long allVocN = 0;
 	private ArrayList<Integer> askedIds = new ArrayList<>();
@@ -20,7 +19,6 @@ public class Vokabeltrainer {
 
 	public Vokabeltrainer(String dbPath) {
 		super();
-		this.dbPath = dbPath;
 		this.db = new DataBaseAdministrator(dbPath);
 		this.colums = db.determineColumns();
 		this.initRandomVocabulary();
@@ -30,7 +28,7 @@ public class Vokabeltrainer {
 	}
 
 	public String getActVocable() {
-		return this.actVoc[this.languageId];
+		return this.actVoc[this.askId];
 	}
 
 	public String getNextVocable() {
@@ -122,7 +120,7 @@ public class Vokabeltrainer {
 
 	public boolean isPossibleSolution(String text) {
 		String sql = "SELECT " + this.colums.get(this.answerId) + " FROM " + this.db.getTableName() + " WHERE "
-				+ this.colums.get(this.languageId) + " LIKE '%" + this.actVoc[this.languageId] + "%';";
+				+ this.colums.get(this.askId) + " LIKE '%" + this.actVoc[this.askId] + "%';";
 		try {
 			ResultSet rs = this.db.executeSQLWithResult(sql);
 			while (rs.next()) {
@@ -135,6 +133,12 @@ public class Vokabeltrainer {
 			this.db.closeConnection();
 		}
 		return false;
+	}
+
+	public void reverse() {
+		int help = this.askId;
+		this.askId = this.answerId;
+		this.answerId = help;
 	}
 
 }
