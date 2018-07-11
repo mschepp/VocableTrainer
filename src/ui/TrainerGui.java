@@ -73,7 +73,7 @@ public class TrainerGui extends Application {
 		// Font font3 = new Font(24);
 		Font font3 = Font.font("Meiryo", 20);
 		Font font4 = Font.font("Meiryo", 16);
-		this.actVoc = new Label(this.vocTrainer.getActVocable());
+		this.actVoc = new Label(this.vocTrainer.getAskedInformation());
 		this.actVoc.setFont(font3);
 		this.solution = new Label(solutionTextDefault);
 		this.solution.setFont(font4);
@@ -373,7 +373,7 @@ public class TrainerGui extends Application {
 	}
 
 	public void refresh() {
-		this.actVoc.setText(this.vocTrainer.getActVocable());
+		this.actVoc.setText(this.vocTrainer.getAskedInformation());
 	}
 
 	private void showDialog() {
