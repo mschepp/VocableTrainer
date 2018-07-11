@@ -1,6 +1,7 @@
 package ui;
 
 import java.io.File;
+import java.util.HashMap;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -58,6 +59,9 @@ public class TrainerGui extends Application {
 	private String germanTxt = "Deutsch";
 	private String txtActAnswerBttn = germanTxt;
 	private String txtActQuestBttn = kanaTxt;
+
+	private HashMap<String, RadioMenuItem> modiQuestBttn = new HashMap<>();
+	private HashMap<String, RadioMenuItem> modiAnswerBttn = new HashMap<>();
 
 	Vokabeltrainer vocTrainer;
 
@@ -145,6 +149,16 @@ public class TrainerGui extends Application {
 		germanAnswer = new RadioMenuItem(germanTxt);
 		germanAnswer.setToggleGroup(answerMod);
 		germanAnswer.setSelected(true);
+
+		modiAnswerBttn.put(kanaTxt, kanaAnswer);
+		modiAnswerBttn.put(kanjiTxt, kanjiAnswer);
+		modiAnswerBttn.put(romajiTxt, romajiAnswer);
+		modiAnswerBttn.put(germanTxt, germanAnswer);
+
+		modiQuestBttn.put(kanaTxt, kanaQuest);
+		modiQuestBttn.put(kanjiTxt, kanjiQuest);
+		modiQuestBttn.put(romajiTxt, romajiQuest);
+		modiQuestBttn.put(germanTxt, germanQuest);
 
 		// add menu,items and submenu
 		menuBar.getMenus().add(menu);
@@ -260,7 +274,7 @@ public class TrainerGui extends Application {
 						ObservableList<Toggle> ol = answerMod.getToggles();
 						for (int i = 0; i < ol.size(); i++) {
 							if (txtActAnswerBttn.equals(((RadioMenuItem) ol.get(i)).getText())) {
-								((RadioMenuItem)ol.get(i)).setSelected(true);
+								((RadioMenuItem) ol.get(i)).setSelected(true);
 								break;
 							}
 						}
@@ -318,7 +332,7 @@ public class TrainerGui extends Application {
 					+ "Bitte unterschiedliche Modi w" + UMLAUT_AE + "hlen.", 500, 100);
 			return false;
 		}
-		if (this.vocTrainer.isGermanSearched()) {
+		if (this.vocTrainer.isGermanSearched() || mod.equals(japaneseWriting.GERMAN)) {
 			if ((this.vocTrainer.getActVocInfo()[mod.getIdx()] != null
 					&& !this.vocTrainer.getActVocInfo()[mod.getIdx()].equals(""))) {
 				this.vocTrainer.setAskId(mod.getIdx());
@@ -447,6 +461,11 @@ public class TrainerGui extends Application {
 	 */
 	public void reverse() {
 		this.vocTrainer.reverse();
+		String helpString = this.txtActAnswerBttn;
+		this.modiQuestBttn.get(this.txtActQuestBttn).setSelected(false);
+		this.modiAnswerBttn.get(this.txtActAnswerBttn).setSelected(false);
+		this.modiAnswerBttn.get(this.txtActQuestBttn).setSelected(true);
+		this.modiQuestBttn.get(helpString).setSelected(true);
 		refresh();
 
 	}
