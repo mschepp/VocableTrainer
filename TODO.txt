@@ -1,0 +1,4 @@
+* Javadoc schreiben
+* unit test für trainer
+* create database from txtfile
+* 
