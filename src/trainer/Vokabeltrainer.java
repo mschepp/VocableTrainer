@@ -27,7 +27,6 @@ public class Vokabeltrainer {
 
 	}
 
-
 	public int getAskId() {
 		return askId;
 	}

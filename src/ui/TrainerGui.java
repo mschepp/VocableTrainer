@@ -4,6 +4,9 @@ import java.io.File;
 
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.HPos;
@@ -15,7 +18,10 @@ import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.control.RadioMenuItem;
 import javafx.scene.control.TextField;
+import javafx.scene.control.Toggle;
+import javafx.scene.control.ToggleGroup;
 import javafx.scene.effect.BlendMode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.ColumnConstraints;
@@ -45,6 +51,13 @@ public class TrainerGui extends Application {
 	private String dbPath = System.getProperty("user.dir") + "/Database/vokabeln.sql";
 	private String solutionTextDefault = "Solution";
 	private int col2Width = 255;
+
+	private String kanaTxt = "Kana";
+	private String romajiTxt = "Romaji";
+	private String kanjiTxt = "Kanaji";
+	private String germanTxt = "Deutsch";
+	private String txtActAnswerBttn = germanTxt;
+	private String txtActQuestBttn = kanaTxt;
 
 	Vokabeltrainer vocTrainer;
 
@@ -86,30 +99,52 @@ public class TrainerGui extends Application {
 
 		// menu
 		MenuBar menuBar;
-		Menu menu, modus, answerMenu, questMenu;
-		MenuItem exit, dbAction, reverseItem, kanjiQuest, kanjiAnswer, kanaQuest, kanaAnswer, romajiQuest, romajiAnswer;
+		Menu menu, modus, questMenu, answerMenu;
+		MenuItem exit, dbAction, reverseItem;
+		RadioMenuItem kanaQuest, kanjiQuest, romajiQuest, germanQuest, kanaAnswer, kanjiAnswer, romajiAnswer,
+				germanAnswer;
+		ToggleGroup questMod, answerMod;
 
 		// init menu
 		menuBar = new MenuBar();
 		menu = new Menu("Men" + UMLAUT_UE);
 		modus = new Menu("Modus");
-
-		answerMenu = new Menu("answerModus");
-		questMenu = new Menu("askModus");
+		questMenu = new Menu("Frage Modi");
+		answerMenu = new Menu("Antwort Modi");
 
 		// menuitems
 		exit = new MenuItem("exit");
 		dbAction = new MenuItem("Database");
 		reverseItem = new MenuItem("reverse");
 
-		kanaAnswer = new MenuItem("Kana");
-		kanaQuest = new MenuItem("Kana");
+		questMod = new ToggleGroup();
+		answerMod = new ToggleGroup();
 
-		kanjiAnswer = new MenuItem("Kanji");
-		kanjiQuest = new MenuItem("Kanji");
+		kanaQuest = new RadioMenuItem(kanaTxt);
+		kanaQuest.setToggleGroup(questMod);
+		kanaQuest.setSelected(true);
 
-		romajiAnswer = new MenuItem("Romaji");
-		romajiQuest = new MenuItem("Romaji");
+		kanjiQuest = new RadioMenuItem(kanjiTxt);
+		kanjiQuest.setToggleGroup(questMod);
+
+		romajiQuest = new RadioMenuItem(romajiTxt);
+		romajiQuest.setToggleGroup(questMod);
+
+		germanQuest = new RadioMenuItem(germanTxt);
+		germanQuest.setToggleGroup(questMod);
+
+		kanaAnswer = new RadioMenuItem(kanaTxt);
+		kanaAnswer.setToggleGroup(answerMod);
+
+		kanjiAnswer = new RadioMenuItem(kanjiTxt);
+		kanjiAnswer.setToggleGroup(answerMod);
+
+		romajiAnswer = new RadioMenuItem(romajiTxt);
+		romajiAnswer.setToggleGroup(answerMod);
+
+		germanAnswer = new RadioMenuItem(germanTxt);
+		germanAnswer.setToggleGroup(answerMod);
+		germanAnswer.setSelected(true);
 
 		// add menu,items and submenu
 		menuBar.getMenus().add(menu);
@@ -119,16 +154,18 @@ public class TrainerGui extends Application {
 		menu.getItems().add(exit);
 
 		modus.getItems().add(reverseItem);
-		modus.getItems().add(answerMenu);
 		modus.getItems().add(questMenu);
+		modus.getItems().add(answerMenu);
 
 		answerMenu.getItems().add(kanaAnswer);
 		answerMenu.getItems().add(kanjiAnswer);
 		answerMenu.getItems().add(romajiAnswer);
+		answerMenu.getItems().add(germanAnswer);
 
 		questMenu.getItems().add(kanaQuest);
 		questMenu.getItems().add(kanjiQuest);
 		questMenu.getItems().add(romajiQuest);
+		questMenu.getItems().add(germanQuest);
 
 		bPane.setTop(menuBar);
 
@@ -173,45 +210,63 @@ public class TrainerGui extends Application {
 			}
 		});
 
-		kanaAnswer.setOnAction(new EventHandler<ActionEvent>() {
+		questMod.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
 			@Override
-			public void handle(ActionEvent e) {
-				setModusAnswer(japaneseWriting.KANA);
+			public void changed(ObservableValue<? extends Toggle> ov, Toggle old_toggle, Toggle new_toggle) {
+				// Has selection.
+
+				if (questMod.getSelectedToggle() != null) {
+					RadioMenuItem button = (RadioMenuItem) questMod.getSelectedToggle();
+					boolean changeWorked = false;
+					if (button.getText().equals(kanaTxt))
+						changeWorked = setModusQuest(japaneseWriting.KANA);
+					else if (button.getText().equals(kanjiTxt))
+						changeWorked = setModusQuest(japaneseWriting.KANJI);
+					else if (button.getText().equals(romajiTxt))
+						changeWorked = setModusQuest(japaneseWriting.ROMAJI);
+					else if (button.getText().equals(germanTxt))
+						changeWorked = setModusQuest(japaneseWriting.GERMAN);
+					if (!changeWorked) {
+						ObservableList<Toggle> ol = questMod.getToggles();
+						for (int i = 0; i < ol.size(); i++) {
+							if (txtActQuestBttn.equals(((RadioMenuItem) ol.get(i)).getText())) {
+								((RadioMenuItem) ol.get(i)).setSelected(true);
+								break;
+							}
+						}
+					} else
+						txtActQuestBttn = button.getText();
+				}
 			}
 		});
 
-		kanaQuest.setOnAction(new EventHandler<ActionEvent>() {
+		answerMod.selectedToggleProperty().addListener(new ChangeListener<Toggle>() {
 			@Override
-			public void handle(ActionEvent e) {
-				setModusQuest(japaneseWriting.KANA);
-			}
-		});
+			public void changed(ObservableValue<? extends Toggle> ov, Toggle old_toggle, Toggle new_toggle) {
+				// Has selection.
 
-		kanjiAnswer.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				setModusAnswer(japaneseWriting.KANJI);
-			}
-		});
-
-		kanjiQuest.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				setModusQuest(japaneseWriting.KANJI);
-			}
-		});
-
-		romajiAnswer.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				setModusAnswer(japaneseWriting.ROMAJI);
-			}
-		});
-
-		romajiQuest.setOnAction(new EventHandler<ActionEvent>() {
-			@Override
-			public void handle(ActionEvent e) {
-				setModusQuest(japaneseWriting.ROMAJI);
+				if (answerMod.getSelectedToggle() != null) {
+					RadioMenuItem button = (RadioMenuItem) answerMod.getSelectedToggle();
+					boolean changeWorked = false;
+					if (button.getText().equals(kanaTxt))
+						changeWorked = setModusAnswer(japaneseWriting.KANA);
+					else if (button.getText().equals(kanjiTxt))
+						changeWorked = setModusAnswer(japaneseWriting.KANJI);
+					else if (button.getText().equals(romajiTxt))
+						changeWorked = setModusAnswer(japaneseWriting.ROMAJI);
+					else if (button.getText().equals(germanTxt))
+						changeWorked = setModusAnswer(japaneseWriting.GERMAN);
+					if (!changeWorked) {
+						ObservableList<Toggle> ol = answerMod.getToggles();
+						for (int i = 0; i < ol.size(); i++) {
+							if (txtActAnswerBttn.equals(((RadioMenuItem) ol.get(i)).getText())) {
+								((RadioMenuItem)ol.get(i)).setSelected(true);
+								break;
+							}
+						}
+					} else
+						txtActAnswerBttn = button.getText();
+				}
 			}
 		});
 
@@ -257,35 +312,45 @@ public class TrainerGui extends Application {
 	}
 
 	//
-	public void setModusQuest(japaneseWriting mod) {
+	public boolean setModusQuest(japaneseWriting mod) {
+		if (mod.getIdx() == this.vocTrainer.getAnswerId()) {
+			errorWindow("F" + UMLAUT_UE + "r Antwort und Frage wurde der gleiche Modus gew" + UMLAUT_AE + "hlt. "
+					+ "Bitte unterschiedliche Modi w" + UMLAUT_AE + "hlen.", 500, 100);
+			return false;
+		}
 		if (this.vocTrainer.isGermanSearched()) {
 			if ((this.vocTrainer.getActVocInfo()[mod.getIdx()] != null
 					&& !this.vocTrainer.getActVocInfo()[mod.getIdx()].equals(""))) {
 				this.vocTrainer.setAskId(mod.getIdx());
+				refresh();
+				return true;
 			} else {
 				errorWindow("Kein Eintrag für den gew" + UMLAUT_AE + "hlten Modus in der Datenbank.", 500, 100);
 			}
 		} else {
 			errorWindow("Deutsch ist gegeben. Deutsch hat keine verschiedene Modi.", 500, 100);
 		}
-		refresh();
+		return false;
+
 	}
 
-	public void setModusAnswer(LanguageModi mod) {
+	public boolean setModusAnswer(LanguageModi mod) {
 		if (mod.getIdx() == this.vocTrainer.getAskId()) {
 			errorWindow("F" + UMLAUT_UE + "r Antwort und Frage wurde der gleiche Modus gew" + UMLAUT_AE + "hlt. "
 					+ "Bitte unterschiedliche Modi w" + UMLAUT_AE + "hlen.", 500, 100);
-			return;
+			return false;
 		}
 		if (mod.getIdx() != -1) {
 			if ((this.vocTrainer.getActVocInfo()[mod.getIdx()] != null
 					&& !this.vocTrainer.getActVocInfo()[mod.getIdx()].equals(""))) {
 				this.vocTrainer.setAnswerId(mod.getIdx());
 				refresh();
+				return true;
 			}
 		} else {
 			errorWindow("Kein Eintrag für den gew" + UMLAUT_AE + "hlten Modus in der Datenbank.", 500, 100);
 		}
+		return false;
 	}
 
 	public void resetTextField() {
