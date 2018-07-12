@@ -1,4 +1,4 @@
 * Javadoc schreiben
-* unit test für trainer
+* unit test fuer trainer
 * create database from txtfile
-* string vergleiche auf ähnlichkeit
+* string vergleiche aufaehnlichkeit
