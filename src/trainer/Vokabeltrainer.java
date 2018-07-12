@@ -113,8 +113,7 @@ public class Vokabeltrainer {
 		try {
 			setAllVocN();
 			ArrayList<String> row = getVocable();
-			String[] help = {};
-			this.actVoc = row.toArray(help);
+			this.actVoc = row.toArray(this.help);
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
 		} finally {
